@@ -1,0 +1,54 @@
+@startuml ticket-manager
+
+' Entities
+entity besuche {
+    *id : int
+    anfang : datetime
+    ende : datetime
+    reihe : char
+    platz : tinyint
+    untertitel : boolean
+    snackzuschlag_chf : decimal [nullable]
+    film_id : int
+    typ_id : int [nullable]
+    sprache_id : int
+    saal_id : int
+}
+
+entity filme {
+    *id : int
+    filmtitel : string
+    bild : string
+}
+
+entity typen {
+    *id : int
+    name : string
+    zuschlag_chf : decimal [nullable]
+}
+
+entity sprachen {
+    *id : int
+    name : string
+}
+
+entity saele {
+    *id : int
+    name : string
+    kino_id : int
+}
+
+entity kinos {
+    *id : int
+    ort : string
+    name : string
+}
+
+' Relationships
+filme ||--o{ besuche : film_id
+typen ||--o{ besuche : typ_id
+sprachen ||--o{ besuche : sprache_id
+saele ||--o{ besuche : saal_id
+kinos ||--o{ saele : kino_id
+
+@enduml

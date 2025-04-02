@@ -1,0 +1,16 @@
+{
+    "folders": [
+        {
+            "path": "."
+        }
+    ],
+    "settings": {
+        "terminal.integrated.profiles.linux": {
+            "Docker Bash": {
+                "path": "docker-compose",
+                "args": ["exec", "app", "bash"]
+            }
+        },
+        "terminal.integrated.defaultProfile.linux": "Docker Bash"
+    }
+}
