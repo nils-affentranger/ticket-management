@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Film extends Model
 {
     protected $table = 'filme';
-    protected $fillable = ['filmtitel', 'bild'];
+    protected $fillable = ['filmtitel', 'bild_url'];
 
     public function besuche()
     {

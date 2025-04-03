@@ -1,0 +1,28 @@
+@startuml
+title User Interaction Flow: Besuch hinzufügen
+
+start
+:User klickt + Knopf;
+:Besuch hinzufügen Seite öffnen;
+:Input: Filmtitel;
+note right: Autocomplete beginnt
+
+if (Film in DB?) then (ja)
+  :Film aus DB laden;
+  :Plattform='local' und\nFilm-ID zwischenspeichern;
+else (nein)
+  :Film in TMDb API suchen;
+  :Plattform='tmdb' und\nFilm-ID zwischenspeichern;
+endif 
+
+if (Bild URL in DB?) then (ja)
+  :Bild URL aus DB laden;
+else (nein)
+  :Bild URL in TMDb API suchen;
+  :Bild URL in DB speichern;
+endif
+
+:Besuch hinzufügen abschließen;
+stop
+
+@enduml

@@ -15,12 +15,19 @@ class FilmController extends Controller
         return response()->json(Film::all());
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $validated = $request->validate([
+            'filmtitel' => 'required|string|max:255',
+            'bild_url' => 'required|url',
+        ]);
+
+        $film = new Film();
+        $film->filmtitel = $validated['filmtitel'];
+        $film->bild_url = $validated['bild_url'];
+        $film->save();
+
+        return response()->json($film, 201); // 201 Created status code
     }
 
     /**
@@ -28,7 +35,7 @@ class FilmController extends Controller
      */
     public function show(Film $film)
     {
-        //
+        return response()->json($film);
     }
 
     /**
@@ -36,7 +43,15 @@ class FilmController extends Controller
      */
     public function update(Request $request, Film $film)
     {
-        //
+        $validated = $request->validate([
+            'filmtitel' => 'sometimes|required|string|max:255',
+            'bild_url' => 'sometimes|required|url',
+        ]);
+
+        $film->fill($validated);
+        $film->save();
+
+        return response()->json($film);
     }
 
     /**
@@ -44,6 +59,8 @@ class FilmController extends Controller
      */
     public function destroy(Film $film)
     {
-        //
+        $film->delete();
+
+        return response()->json(null, 204); // 204 No Content
     }
 }
