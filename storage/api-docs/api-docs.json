@@ -1,0 +1,1862 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Film API Documentation",
+        "description": "API documentation for Film management",
+        "contact": {
+            "email": "your-email@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "/",
+            "description": "Main API Server"
+        }
+    ],
+    "paths": {
+        "/api/besuche": {
+            "get": {
+                "tags": [
+                    "Besuche"
+                ],
+                "summary": "Liste aller Kinobesuche",
+                "operationId": "af02d529811403ca04634b6bdb8355f1",
+                "responses": {
+                    "200": {
+                        "description": "Liste von Kinobesuchen",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Besuch"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Besuche"
+                ],
+                "summary": "Erstelle einen neuen Kinobesuch",
+                "operationId": "6435fe5032c0ddf03bbc2b187bd9ee20",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BesuchInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Kinobesuch erfolgreich erstellt",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Besuch"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validierungsfehler",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Die angegebenen Daten sind ungültig."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/besuche/{id}": {
+            "get": {
+                "tags": [
+                    "Besuche"
+                ],
+                "summary": "Zeige einen Kinobesuch",
+                "operationId": "b1e10a2cb2d3cea28c07bd91397676eb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Kinobesuchs",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kinobesuch",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Besuch"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kinobesuch nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Besuch nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Besuche"
+                ],
+                "summary": "Aktualisiere einen Kinobesuch",
+                "operationId": "74f32b0c2a100e7c28ac919d6e72b908",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Kinobesuchs",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/BesuchInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Kinobesuch aktualisiert",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Besuch"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kinobesuch nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Besuch nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validierungsfehler",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Die angegebenen Daten sind ungültig."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Besuche"
+                ],
+                "summary": "Lösche einen Kinobesuch",
+                "operationId": "bb8ed520449bd1f1a18599687299f997",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Kinobesuchs",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Kinobesuch gelöscht"
+                    },
+                    "404": {
+                        "description": "Kinobesuch nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Besuch nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/filme": {
+            "get": {
+                "tags": [
+                    "Filme"
+                ],
+                "summary": "Liste aller Filme oder Suche nach Film",
+                "operationId": "f85398ce9a7441b1dd51fa569f4fdaed",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Suchbegriff",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste von Filmen",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Film"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Filme"
+                ],
+                "summary": "Erstelle einen neuen Film",
+                "operationId": "9004a323d5fd1e379e9cbac810c7b74a",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FilmInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Film erfolgreich erstellt",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Film"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/filme/{id}": {
+            "get": {
+                "tags": [
+                    "Filme"
+                ],
+                "summary": "Zeige einen Film ",
+                "operationId": "db70560816bd8441594520a8b0d1e1e6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Films",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Film",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Film"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Film nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Film nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Filme"
+                ],
+                "summary": "Aktualisiere einen Film",
+                "operationId": "0e77d5494d0885e04df4f2020654750f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Films",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/FilmInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Film aktualisiert",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Film"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Film nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Film nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Filme"
+                ],
+                "summary": "Lösche einen Film",
+                "operationId": "386034c9b596019cdb84dbca066989c4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Films",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Film gelöscht"
+                    },
+                    "404": {
+                        "description": "Film nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Film nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Film wird noch verwendet",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Film kann nicht gelöscht werden, da er verwendet wird."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "foreign_key_constraint_violation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/kinos": {
+            "get": {
+                "tags": [
+                    "Kinos"
+                ],
+                "summary": "Liste aller Kinos",
+                "operationId": "29bb2fd11976b4b0fd41d02f9422d40a",
+                "responses": {
+                    "200": {
+                        "description": "Liste von Kinos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Kino"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Kinos"
+                ],
+                "summary": "Erstelle ein neues Kino",
+                "operationId": "1c430015a7760f0f49d265c97f6b4fc8",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/KinoInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Kino erfolgreich erstellt",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Kino"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/kinos/{id}": {
+            "get": {
+                "tags": [
+                    "Kinos"
+                ],
+                "summary": "Zeige ein Kino",
+                "operationId": "f3db480a7148a688e72ea34c36a57b07",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Kinos",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Kino",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Kino"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kino nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kino nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Kinos"
+                ],
+                "summary": "Aktualisiere ein Kino",
+                "operationId": "fd9e797ab9983715ce4ccb7ea7eb6906",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Kinos",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/KinoInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Kino aktualisiert",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Kino"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Kino nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kino nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Kinos"
+                ],
+                "summary": "Lösche ein Kino",
+                "operationId": "e92eb530f9f775c38a40f2da76c89d43",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Kinos",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Kino gelöscht"
+                    },
+                    "404": {
+                        "description": "Kino nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kino nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Kino wird noch verwendet",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Kino kann nicht gelöscht werden, da es von einem oder mehreren Sälen verwendet wird."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "foreign_key_constraint_violation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/saele": {
+            "get": {
+                "tags": [
+                    "Säle"
+                ],
+                "summary": "Liste aller Säle",
+                "operationId": "4c72de9dc4e1126d81540e369f7eae28",
+                "responses": {
+                    "200": {
+                        "description": "Liste von Sälen",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Saal"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Säle"
+                ],
+                "summary": "Erstelle einen neuen Saal",
+                "operationId": "623dec9cd0ef581f25b55a82e79d7527",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaalInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Saal erfolgreich erstellt",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Saal"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validierungsfehler",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Der Saalname existiert bereits in diesem Kino."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/saele/{id}": {
+            "get": {
+                "tags": [
+                    "Säle"
+                ],
+                "summary": "Zeige einen Saal",
+                "operationId": "922a8f1015f02b03284f581a54a0a3a9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Saals",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Saal",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Saal"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Saal nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Saal nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Säle"
+                ],
+                "summary": "Aktualisiere einen Saal",
+                "operationId": "93a80c9b7e4ccaf70a6eea3f0552ebe9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Saals",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SaalInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Saal aktualisiert",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Saal"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Saal nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Saal nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validierungsfehler",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Der Saalname existiert bereits in diesem Kino."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Säle"
+                ],
+                "summary": "Lösche einen Saal",
+                "operationId": "4157c3dd13a17480bfab5dadb0755cac",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Saals",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Saal gelöscht"
+                    },
+                    "404": {
+                        "description": "Saal nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Saal nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Saal wird noch verwendet",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Saal kann nicht gelöscht werden, da er von einem oder mehreren Besuchen verwendet wird."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "foreign_key_constraint_violation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sprachen": {
+            "get": {
+                "tags": [
+                    "Sprachen"
+                ],
+                "summary": "Liste aller Sprachen",
+                "operationId": "7a58bc05bf38f86010a4a377c8860846",
+                "responses": {
+                    "200": {
+                        "description": "Liste von Sprachen",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Sprache"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Sprachen"
+                ],
+                "summary": "Erstelle eine neue Sprache",
+                "operationId": "7ec712b96baec12279db21ccdc07a1c5",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SpracheInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Sprache erfolgreich erstellt",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Sprache"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/sprachen/{id}": {
+            "get": {
+                "tags": [
+                    "Sprachen"
+                ],
+                "summary": "Zeige eine Sprache",
+                "operationId": "56d82c8dc0714e391d3cb35635633e35",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID der Sprache",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Sprache",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Sprache"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sprache nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sprache nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Sprachen"
+                ],
+                "summary": "Aktualisiere eine Sprache",
+                "operationId": "40ea7324414c4ede347ef486c6c6fa7a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID der Sprache",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/SpracheInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Sprache aktualisiert",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Sprache"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Sprache nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sprache nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Sprachen"
+                ],
+                "summary": "Lösche eine Sprache",
+                "operationId": "586aa9173e82875e4e7ac75f079d8eb9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID der Sprache",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Sprache gelöscht"
+                    },
+                    "404": {
+                        "description": "Sprache nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sprache nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Sprache wird noch verwendet",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Sprache kann nicht gelöscht werden, da sie von einem oder mehreren Besuchen verwendet wird."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "foreign_key_constraint_violation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/typen": {
+            "get": {
+                "tags": [
+                    "Typen"
+                ],
+                "summary": "Liste aller Tickettypen",
+                "operationId": "55de1face28ab22b3c253491bc3c3cc6",
+                "responses": {
+                    "200": {
+                        "description": "Liste von Tickettypen",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Typ"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Typen"
+                ],
+                "summary": "Erstelle einen neuen Tickettyp",
+                "operationId": "68a69ef718bbf04b4e051a6ff0f51d46",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TypInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Tickettyp erfolgreich erstellt",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Typ"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/typen/{id}": {
+            "get": {
+                "tags": [
+                    "Typen"
+                ],
+                "summary": "Zeige einen Tickettyp",
+                "operationId": "74e505f4fbe3bfc5aa32585d25262311",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Tickettyps",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Tickettyp",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Typ"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tickettyp nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Typ nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Typen"
+                ],
+                "summary": "Aktualisiere einen Tickettyp",
+                "operationId": "52391048ad320dddc01ee6696313185e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Tickettyps",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TypInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Tickettyp aktualisiert",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Typ"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Tickettyp nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Typ nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Typen"
+                ],
+                "summary": "Lösche einen Tickettyp",
+                "operationId": "ce5670b45ecb253c5ed79b10d7e26945",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID des Tickettyps",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Tickettyp gelöscht"
+                    },
+                    "404": {
+                        "description": "Tickettyp nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Typ nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Tickettyp wird noch verwendet",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Typ kann nicht gelöscht werden, da er von einem oder mehreren Besuchen verwendet wird."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "foreign_key_constraint_violation"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Besuch": {
+                "required": [
+                    "id",
+                    "anfang",
+                    "ende",
+                    "reihe",
+                    "platz",
+                    "untertitel",
+                    "film_id",
+                    "typ_id",
+                    "sprache_id",
+                    "saal_id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "anfang": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-15T18:30:00+00:00"
+                    },
+                    "ende": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-15T21:00:00+00:00"
+                    },
+                    "reihe": {
+                        "type": "string",
+                        "example": "A"
+                    },
+                    "platz": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "untertitel": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "snackzuschlag_chf": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.5,
+                        "nullable": true
+                    },
+                    "film_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "typ_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "sprache_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "saal_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "BesuchInput": {
+                "required": [
+                    "anfang",
+                    "ende",
+                    "reihe",
+                    "platz",
+                    "untertitel",
+                    "film_id",
+                    "typ_id",
+                    "sprache_id",
+                    "saal_id"
+                ],
+                "properties": {
+                    "anfang": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-15T18:30:00+00:00"
+                    },
+                    "ende": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-04-15T21:00:00+00:00"
+                    },
+                    "reihe": {
+                        "type": "string",
+                        "example": "A"
+                    },
+                    "platz": {
+                        "type": "integer",
+                        "example": 12
+                    },
+                    "untertitel": {
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "snackzuschlag_chf": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 3.5,
+                        "nullable": true
+                    },
+                    "film_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "typ_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "sprache_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "saal_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "Film": {
+                "required": [
+                    "id",
+                    "filmtitel",
+                    "bild_url"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "filmtitel": {
+                        "type": "string",
+                        "example": "Oppenheimer"
+                    },
+                    "bild_url": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://www.themoviedb.org/t/p/w1280/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "FilmInput": {
+                "required": [
+                    "filmtitel",
+                    "bild_url"
+                ],
+                "properties": {
+                    "filmtitel": {
+                        "type": "string",
+                        "example": "Oppenheimer"
+                    },
+                    "bild_url": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "https://www.themoviedb.org/t/p/w1280/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg"
+                    }
+                },
+                "type": "object"
+            },
+            "Kino": {
+                "required": [
+                    "id",
+                    "name",
+                    "ort"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Cinépolis"
+                    },
+                    "ort": {
+                        "type": "string",
+                        "example": "Zürich"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "KinoInput": {
+                "required": [
+                    "name",
+                    "ort"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Cinépolis"
+                    },
+                    "ort": {
+                        "type": "string",
+                        "example": "Zürich"
+                    }
+                },
+                "type": "object"
+            },
+            "Saal": {
+                "required": [
+                    "id",
+                    "name",
+                    "kino_id"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Saal 1"
+                    },
+                    "kino_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "SaalInput": {
+                "required": [
+                    "name",
+                    "kino_id"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Saal 1"
+                    },
+                    "kino_id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "Sprache": {
+                "required": [
+                    "id",
+                    "name"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "Deutsch"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "SpracheInput": {
+                "required": [
+                    "name"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "Deutsch"
+                    }
+                },
+                "type": "object"
+            },
+            "Typ": {
+                "required": [
+                    "id",
+                    "name",
+                    "zuschlag_chf"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "VIP"
+                    },
+                    "zuschlag_chf": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 5.5
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "TypInput": {
+                "required": [
+                    "name",
+                    "zuschlag_chf"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "example": "VIP"
+                    },
+                    "zuschlag_chf": {
+                        "type": "number",
+                        "format": "float",
+                        "example": 5.5
+                    }
+                },
+                "type": "object"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Besuche",
+            "description": "API-Endpunkte zum Verwalten von Kinobesuchen"
+        },
+        {
+            "name": "Filme",
+            "description": "API-Endpunkte zum Verwalten von Filmen"
+        },
+        {
+            "name": "Kinos",
+            "description": "API-Endpunkte zum Verwalten von Kinos"
+        },
+        {
+            "name": "Säle",
+            "description": "API-Endpunkte zum Verwalten von Kinosälen"
+        },
+        {
+            "name": "Sprachen",
+            "description": "API-Endpunkte zum Verwalten von Sprachen"
+        },
+        {
+            "name": "Typen",
+            "description": "API-Endpunkte zum Verwalten von Tickettypen"
+        }
+    ]
+}
