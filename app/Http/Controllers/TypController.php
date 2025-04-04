@@ -19,6 +19,20 @@ class TypController extends Controller
      *     path="/api/typen",
      *     summary="Liste aller Tickettypen",
      *     tags={"Typen"},
+     *     @OA\Parameter(
+     *         name="query",
+     *         in="query",
+     *         description="Suchbegriff zum Filtern der Tickettypen",
+     *         required=false,
+     *         @OA\Schema(type="string", maxLength=255)
+     *     ),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximale Anzahl der zurückzugebenden Tickettypen",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=100)
+     *     ),
      *     @OA\Response(
      *         response="200",
      *         description="Liste von Tickettypen",
@@ -29,9 +43,25 @@ class TypController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Typ::all());
+        $validated = $request->validate([
+            'query' => 'sometimes|string|max:255',
+            'limit' => 'sometimes|integer|min:1|max:100'
+        ]);
+        $query = $validated['query'] ?? null;
+        $limit = $validated['limit'] ?? null;
+        $typen = Typ::all()->toArray();
+
+        if ($query) {
+            return $this->search($query, $limit, $typen);
+        }
+
+        if ($limit) {
+            $typen = array_slice($typen, 0, $limit);
+        }
+
+        return response()->json($typen);
     }
 
     /**
@@ -193,14 +223,14 @@ class TypController extends Controller
     public function destroy($id)
     {
         $typ = Typ::find($id);
-        
+
         if (!$typ) {
             return response()->json([
                 'message' => 'Typ nicht gefunden.',
                 'error' => 'resource_not_found'
             ], 404);
         }
-        
+
         try {
             $typ->delete();
             return response()->json(null, 204); // 204 No Content
@@ -218,5 +248,39 @@ class TypController extends Controller
             ], 500);
         }
     }
-}
 
+    public function search($suchBegriff, $limit, $allTypen)
+    {
+        $suchBegriff = strtolower(trim($suchBegriff));
+        $resultate = [];
+
+        foreach ($allTypen as $typ) {
+            $name = strtolower($typ['name']);
+
+            if (str_contains($name, $suchBegriff)) {
+                $distance = levenshtein($name, $suchBegriff);
+
+                // Typen, die mit dem Suchbegriff anfangen, sollen weiter oben stehen.
+                if (str_starts_with($name, $suchBegriff)) {
+                    $distance -= 5;
+                }
+
+                $typ['distance'] = $distance;
+                $resultate[] = $typ;
+            }
+        }
+
+        // Resultate nach Distanz sortieren
+        usort($resultate, function ($a, $b) {
+            return $a['distance'] <=> $b['distance'];
+        });
+
+        $resultate = array_slice($resultate, 0, $limit ?? 10);
+
+        foreach ($resultate as &$typ) {
+            unset($typ['distance']);
+        }
+
+        return response()->json($resultate);
+    }
+}

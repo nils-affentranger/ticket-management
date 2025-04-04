@@ -6,6 +6,7 @@ use App\Http\Controllers\BesuchController;
 use App\Http\Controllers\SpracheController;
 use App\Http\Controllers\TypController;
 use App\Http\Controllers\SaalController;
+use App\Http\Controllers\EinstellungController;
 use Illuminate\Support\Facades\Route;
 use OpenApi\Annotations as OA;
 
@@ -56,3 +57,11 @@ Route::get('/saele/{saal}', [SaalController::class, 'show']);
 Route::put('/saele/{saal}', [SaalController::class, 'update']);
 Route::patch('/saele/{saal}', [SaalController::class, 'update']);
 Route::delete('/saele/{saal}', [SaalController::class, 'destroy']);
+
+// Einstellungen routes
+Route::get('/einstellungen', [EinstellungController::class, 'index']);
+Route::post('/einstellungen', [EinstellungController::class, 'store']);
+Route::get('/einstellungen/{key}', [EinstellungController::class, 'show']);
+Route::put('/einstellungen/{key}', [EinstellungController::class, 'update']);
+Route::delete('/einstellungen/{key}', [EinstellungController::class, 'destroy']);
+Route::get('/einstellungen/value/{key}', [EinstellungController::class, 'getValue']);

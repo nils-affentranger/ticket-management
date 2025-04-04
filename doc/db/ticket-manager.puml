@@ -44,6 +44,11 @@ entity kinos {
     name : string
 }
 
+entity einstellungen {
+    *key : string
+    *value : string
+}
+
 ' Relationships
 filme ||--o{ besuche : film_id
 typen ||--o{ besuche : typ_id

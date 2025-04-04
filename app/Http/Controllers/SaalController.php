@@ -19,6 +19,13 @@ class SaalController extends Controller
      *     path="/api/saele",
      *     summary="Liste aller Säle",
      *     tags={"Säle"},
+     *     @OA\Parameter(
+     *         name="kino_id",
+     *         in="query",
+     *         description="Säle anhand der Kino ID filtern",
+     *         required=false,
+     *         @OA\Schema(type="integer")
+     *     ),
      *     @OA\Response(
      *         response="200",
      *         description="Liste von Sälen",
@@ -29,9 +36,19 @@ class SaalController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Saal::all());
+        $validated = $request->validate([
+            'kino_id' => 'sometimes|integer|exists:kinos,id'
+        ]);
+
+        $kino_id = $validated['kino_id'] ?? null;
+
+        if ($kino_id) {
+            $saele = Saal::where('kino_id', $kino_id)->get();
+        }
+
+        return response()->json($saele);
     }
 
     /**
@@ -221,7 +238,7 @@ class SaalController extends Controller
                 'error' => 'resource_not_found'
             ], 404);
         }
-        
+
         try {
             $saal->delete();
             return response()->json(null, 204); // 204 No Content

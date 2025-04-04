@@ -17,8 +17,23 @@ class KinoController extends Controller
     /**
      * @OA\Get(
      *     path="/api/kinos",
-     *     summary="Liste aller Kinos",
+     *     summary="Liste aller Kinos oder Suche nach Kino (max. 100)",
+     *     description="Gibt eine Liste von Kinos zurück, optional gefiltert durch einen Suchbegriff. Maximal 100 Ergebnisse werden zurückgegeben.",
      *     tags={"Kinos"},
+     *     @OA\Parameter(
+     *         name="query",
+     *         in="query",
+     *         description="Suchbegriff",
+     *         required=false,
+     *         @OA\Schema(type="string", maxLength=255)
+     *     ),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Anzahl der zurückzugebenden Ergebnisse (1-100)",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=10, minimum=1, maximum=100)
+     *     ),
      *     @OA\Response(
      *         response="200",
      *         description="Liste von Kinos",
@@ -29,9 +44,22 @@ class KinoController extends Controller
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Kino::all());
+        // Implement validation to match the documentation
+        $validated = $request->validate([
+            'query' => 'sometimes|string|max:255',
+            'limit' => 'sometimes|integer|min:1|max:100'
+        ]);
+
+        $query = $validated['query'] ?? null;
+        $limit = $validated['limit'] ?? 10;
+
+        $kinos = Kino::all()->toArray();
+        if (!$query) {
+            return response()->json(array_slice($kinos, 0, $limit));
+        }
+        return $this->search($query, $limit, $kinos);
     }
 
     /**
@@ -193,30 +221,29 @@ class KinoController extends Controller
     public function destroy($id)
     {
         $kino = Kino::find($id);
-        
+
         if (!$kino) {
             return response()->json([
                 'message' => 'Kino nicht gefunden.',
                 'error' => 'resource_not_found'
             ], 404);
         }
-        
-        // Check if any of the kino's saele are used in besuche
+
+        // Überprüfen, ob das Kino Säle enthält, die von einem oder mehreren Besuchen verwendet werden.
         $saeleWithBesuche = $kino->saele()->whereHas('besuche')->count();
-        
+
         if ($saeleWithBesuche > 0) {
             return response()->json([
                 'message' => 'Kino kann nicht gelöscht werden, da Säle dieses Kinos noch von Besuchen verwendet werden.',
                 'error' => 'foreign_key_constraint_violation'
             ], 409); // 409 Conflict
         }
-        
-        // If the kino has saele that are not used in besuche, we'll delete those saele first
+
+        // Wenn das Kino Säle enthält, die nicht verwendet werden, werden diese Säle zuerst gelöscht.
         try {
-            // Delete all saele associated with this kino
+            // Alle Säle vom Kino löschen
             $kino->saele()->delete();
-            
-            // Now delete the kino
+
             $kino->delete();
             return response()->json(null, 204); // 204 No Content
         } catch (\Exception $e) {
@@ -226,5 +253,39 @@ class KinoController extends Controller
             ], 500);
         }
     }
-}
 
+    public function search($suchBegriff, $limit, $allKinos)
+    {
+        $suchBegriff = strtolower(trim($suchBegriff));
+        $resultate = [];
+
+        foreach ($allKinos as $kino) {
+            $kinoName = strtolower($kino['name']);
+
+            if (str_contains($kinoName, $suchBegriff)) {
+                $distance = levenshtein($kinoName, $suchBegriff);
+
+                // Kinos, die mit dem Suchbegriff anfangen, sollen weiter oben stehen.
+                if (str_starts_with($kinoName, $suchBegriff)) {
+                    $distance -= 5;
+                }
+
+                $kino['distance'] = $distance;
+                $resultate[] = $kino;
+            }
+        }
+
+        // Resultate nach Distanz sortieren
+        usort($resultate, function ($a, $b) {
+            return $a['distance'] <=> $b['distance'];
+        });
+
+        $resultate = array_slice($resultate, 0, $limit ?? 10);
+
+        foreach ($resultate as &$kino) {
+            unset($kino['distance']);
+        }
+
+        return response()->json($resultate);
+    }
+}

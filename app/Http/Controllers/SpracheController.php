@@ -19,6 +19,20 @@ class SpracheController extends Controller
      *     path="/api/sprachen",
      *     summary="Liste aller Sprachen",
      *     tags={"Sprachen"},
+     *     @OA\Parameter(
+     *         name="query",
+     *         in="query",
+     *         description="Suchbegriff zum Filtern der Sprachen",
+     *         required=false,
+     *         @OA\Schema(type="string", maxLength=255)
+     *     ),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Maximale Anzahl der zurückgegebenen Ergebnisse",
+     *         required=false,
+     *         @OA\Schema(type="integer", minimum=1, maximum=100)
+     *     ),
      *     @OA\Response(
      *         response="200",
      *         description="Liste von Sprachen",
@@ -26,12 +40,39 @@ class SpracheController extends Controller
      *             type="array",
      *             @OA\Items(ref="#/components/schemas/Sprache")
      *         )
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Validierungsfehler",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(property="errors", type="object")
+     *         )
      *     )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Sprache::all());
+        $validated = $request->validate([
+            'query' => 'sometimes|string|max:255',
+            'limit' => 'sometimes|integer|min:1|max:100'
+        ]);
+
+        $query = $validated['query'] ?? null;
+        $limit = $validated['limit'] ?? null;
+
+        $sprachen = Sprache::all()->toArray();
+
+        if ($query) {
+            return $this->search($query, $limit, $sprachen);
+        }
+
+        if ($limit) {
+            $sprachen = array_slice($sprachen, 0, $limit);
+        }
+
+        return response()->json($sprachen);
     }
 
     /**
@@ -190,14 +231,14 @@ class SpracheController extends Controller
     public function destroy($id)
     {
         $sprache = Sprache::find($id);
-        
+
         if (!$sprache) {
             return response()->json([
                 'message' => 'Sprache nicht gefunden.',
                 'error' => 'resource_not_found'
             ], 404);
         }
-        
+
         try {
             $sprache->delete();
             return response()->json(null, 204); // 204 No Content
@@ -215,5 +256,39 @@ class SpracheController extends Controller
             ], 500);
         }
     }
-}
 
+    public function search($suchBegriff, $limit, $allSprachen)
+    {
+        $suchBegriff = strtolower(trim($suchBegriff));
+        $resultate = [];
+
+        foreach ($allSprachen as $sprache) {
+            $name = strtolower($sprache['name']);
+
+            if (str_contains($name, $suchBegriff)) {
+                $distance = levenshtein($name, $suchBegriff);
+
+                // Sprachen, die mit dem Suchbegriff anfangen, sollen weiter oben stehen.
+                if (str_starts_with($name, $suchBegriff)) {
+                    $distance -= 5;
+                }
+
+                $sprache['distance'] = $distance;
+                $resultate[] = $sprache;
+            }
+        }
+
+        // Resultate nach Distanz sortieren
+        usort($resultate, function ($a, $b) {
+            return $a['distance'] <=> $b['distance'];
+        });
+
+        $resultate = array_slice($resultate, 0, $limit ?? 10);
+
+        foreach ($resultate as &$sprache) {
+            unset($sprache['distance']);
+        }
+
+        return response()->json($resultate);
+    }
+}

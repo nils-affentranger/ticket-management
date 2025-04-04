@@ -25,7 +25,7 @@ use Illuminate\Database\Eloquent\Model;
 class Kino extends Model
 {
     protected $table = 'kinos';
-    protected $fillable = ['ort', 'name'];
+    protected $fillable = ['name', 'ort'];
 
     public function saele()
     {

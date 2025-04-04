@@ -17,14 +17,22 @@ class FilmController extends Controller
     /**
      * @OA\Get(
      *     path="/api/filme",
-     *     summary="Liste aller Filme oder Suche nach Film",
+     *     summary="Liste aller Filme oder Suche nach Film (max. 100)",
+     *     description="Gibt eine Liste von Filmen zurück, optional gefiltert durch einen Suchbegriff.",
      *     tags={"Filme"},
      *     @OA\Parameter(
-     *         name="q",
+     *         name="query",
      *         in="query",
      *         description="Suchbegriff",
      *         required=false,
-     *         @OA\Schema(type="string")
+     *         @OA\Schema(type="string", maxLength=255)
+     *     ),
+     *     @OA\Parameter(
+     *         name="limit",
+     *         in="query",
+     *         description="Anzahl der zurückzugebenden Ergebnisse (1-100)",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=10, minimum=1, maximum=100)
      *     ),
      *     @OA\Response(
      *         response="200",
@@ -33,18 +41,35 @@ class FilmController extends Controller
      *             type="array",
      *             @OA\Items(ref="#/components/schemas/Film")
      *         )
+     *     ),
+     *     @OA\Response(
+     *         response="422",
+     *         description="Validierungsfehler",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string"),
+     *             @OA\Property(
+     *                 property="errors",
+     *                 type="object"
+     *             )
+     *         )
      *     )
      * )
      */
     public function index(Request $request)
     {
-        $query = $request->input('q');
+        $validated = $request->validate([
+            'query' => 'sometimes|string|max:255',
+            'limit' => 'sometimes|integer|min:1|max:100'
+        ]);
+        $query = $validated['query'] ?? null;
+        $limit = $validated['limit'] ?? 10;
 
+        $filme = Film::all()->toArray();
         if (!$query) {
-            return response()->json(Film::all());
+            return response()->json(array_slice($filme, 0, $limit));
         }
-
-        return $this->search($query);
+        return $this->search($query, $limit, $filme);
     }
 
     /**
@@ -166,7 +191,8 @@ class FilmController extends Controller
             'bild_url' => 'sometimes|required|url',
         ]);
 
-        $film->fill($validated);
+        $film->filmtitel = $validated['filmtitel'];
+        $film->bild_url = $validated['bild_url'];
         $film->save();
 
         return response()->json($film);
@@ -232,30 +258,38 @@ class FilmController extends Controller
         }
     }
 
-    public function search($searchTerm)
+    public function search($suchBegriff, $limit, $allFilme)
     {
-        $searchTerm = strtolower(trim($searchTerm));
-        $allFilms = Film::all();
+        $suchBegriff = strtolower(trim($suchBegriff));
+        $resultate = [];
 
-        $results = $allFilms
-            ->filter(fn($film) => strpos(strtolower($film->filmtitel), $searchTerm) !== false)
-            ->map(function ($film) use ($searchTerm) {
-                $filmTitle = strtolower($film->filmtitel);
-                $distance = levenshtein($filmTitle, $searchTerm);
-                if (strpos($filmTitle, $searchTerm) === 0) {
+        foreach ($allFilme as $film) {
+            $filmTitel = strtolower($film['filmtitel']);
+
+            if (str_contains($filmTitel, $suchBegriff)) {
+                $distance = levenshtein($filmTitel, $suchBegriff);
+
+                // Filme, die mit dem Suchbegriff anfangen, sollen weiter oben stehen.
+                if (str_starts_with($filmTitel, $suchBegriff)) {
                     $distance -= 5;
                 }
-                $film->distance = $distance;
-                return $film;
-            })
-            ->sortBy('distance')
-            ->take(10)
-            ->map(function ($film) {
-                unset($film->distance);
-                return $film;
-            })
-            ->values();
 
-        return response()->json($results);
+                $film['distance'] = $distance;
+                $resultate[] = $film;
+            }
+        }
+
+        // Resultate nach Distanz sortieren
+        usort($resultate, function ($a, $b) {
+            return $a['distance'] <=> $b['distance'];
+        });
+
+        $resultate = array_slice($resultate, 0, $limit ?? 10);
+
+        foreach ($resultate as &$film) {
+            unset($film['distance']);
+        }
+
+        return response()->json($resultate);
     }
 }

@@ -1,5 +1,11 @@
 ```mermaid
 erDiagram
+	EINSTELLUNGEN {
+		int id PK
+		string key
+		string value
+	}
+	
     BESUCHE {
         int id PK
         datetime anfang

@@ -22,6 +22,63 @@
                 ],
                 "summary": "Liste aller Kinobesuche",
                 "operationId": "af02d529811403ca04634b6bdb8355f1",
+                "parameters": [
+                    {
+                        "name": "datum",
+                        "in": "query",
+                        "description": "Filtert nach Datum",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        }
+                    },
+                    {
+                        "name": "typ_id",
+                        "in": "query",
+                        "description": "Filtert nach Typ ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "film_id",
+                        "in": "query",
+                        "description": "Filtert nach Film ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "kino_id",
+                        "in": "query",
+                        "description": "Filtert nach Kino ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "saal_id",
+                        "in": "query",
+                        "description": "Filtert nach Saal ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    },
+                    {
+                        "name": "sprache_id",
+                        "in": "query",
+                        "description": "Filtert nach Sprache ID",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Liste von Kinobesuchen",
@@ -261,21 +318,321 @@
                 }
             }
         },
+        "/api/einstellungen": {
+            "get": {
+                "tags": [
+                    "Einstellungen"
+                ],
+                "summary": "Liste aller Einstellungen",
+                "operationId": "a7a8b616909d2805b747a195c5e76c9d",
+                "responses": {
+                    "200": {
+                        "description": "Liste von Einstellungen",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Einstellung"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "tags": [
+                    "Einstellungen"
+                ],
+                "summary": "Erstelle eine neue Einstellung",
+                "operationId": "47c6e9ab7711a181a88f63b0b6af92b6",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EinstellungInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Einstellung erfolgreich erstellt",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Einstellung"
+                                }
+                            }
+                        }
+                    },
+                    "409": {
+                        "description": "Schlüssel existiert bereits",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Eine Einstellung mit diesem Schlüssel existiert bereits."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "duplicate_key"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/einstellungen/{key}": {
+            "get": {
+                "tags": [
+                    "Einstellungen"
+                ],
+                "summary": "Zeige eine Einstellung",
+                "operationId": "4e2411da27df1a1149c24acb5252a0f1",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "Schlüssel der Einstellung",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Einstellung",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Einstellung"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Einstellung nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Einstellung nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "put": {
+                "tags": [
+                    "Einstellungen"
+                ],
+                "summary": "Aktualisiere eine Einstellung",
+                "operationId": "9c33a6124db5f2129c26faa5b69799dc",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "Schlüssel der Einstellung",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/EinstellungUpdateInput"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Einstellung aktualisiert",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Einstellung"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Einstellung nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Einstellung nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "tags": [
+                    "Einstellungen"
+                ],
+                "summary": "Lösche eine Einstellung",
+                "operationId": "8cf9272a679c09911ccbcdf5f81c7168",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "Schlüssel der Einstellung",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Einstellung gelöscht"
+                    },
+                    "404": {
+                        "description": "Einstellung nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Einstellung nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/einstellungen/value/{key}": {
+            "get": {
+                "tags": [
+                    "Einstellungen"
+                ],
+                "summary": "Hole nur den Wert einer Einstellung",
+                "operationId": "03d6eddf5e6c3ed4297eb8a3423db182",
+                "parameters": [
+                    {
+                        "name": "key",
+                        "in": "path",
+                        "description": "Schlüssel der Einstellung",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Wert der Einstellung",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "value": {
+                                            "type": "string",
+                                            "example": "10.50"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Einstellung nicht gefunden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Einstellung nicht gefunden."
+                                        },
+                                        "error": {
+                                            "type": "string",
+                                            "example": "resource_not_found"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/filme": {
             "get": {
                 "tags": [
                     "Filme"
                 ],
-                "summary": "Liste aller Filme oder Suche nach Film",
+                "summary": "Liste aller Filme oder Suche nach Film (max. 100)",
+                "description": "Gibt eine Liste von Filmen zurück, optional gefiltert durch einen Suchbegriff.",
                 "operationId": "f85398ce9a7441b1dd51fa569f4fdaed",
                 "parameters": [
                     {
-                        "name": "q",
+                        "name": "query",
                         "in": "query",
                         "description": "Suchbegriff",
                         "required": false,
                         "schema": {
-                            "type": "string"
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Anzahl der zurückzugebenden Ergebnisse (1-100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
                         }
                     }
                 ],
@@ -289,6 +646,24 @@
                                     "items": {
                                         "$ref": "#/components/schemas/Film"
                                     }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validierungsfehler",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -505,8 +880,33 @@
                 "tags": [
                     "Kinos"
                 ],
-                "summary": "Liste aller Kinos",
+                "summary": "Liste aller Kinos oder Suche nach Kino (max. 100)",
+                "description": "Gibt eine Liste von Kinos zurück, optional gefiltert durch einen Suchbegriff. Maximal 100 Ergebnisse werden zurückgegeben.",
                 "operationId": "29bb2fd11976b4b0fd41d02f9422d40a",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Suchbegriff",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Anzahl der zurückzugebenden Ergebnisse (1-100)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10,
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Liste von Kinos",
@@ -735,6 +1135,17 @@
                 ],
                 "summary": "Liste aller Säle",
                 "operationId": "4c72de9dc4e1126d81540e369f7eae28",
+                "parameters": [
+                    {
+                        "name": "kino_id",
+                        "in": "query",
+                        "description": "Säle anhand der Kino ID filtern",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Liste von Sälen",
@@ -1001,6 +1412,29 @@
                 ],
                 "summary": "Liste aller Sprachen",
                 "operationId": "7a58bc05bf38f86010a4a377c8860846",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Suchbegriff zum Filtern der Sprachen",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximale Anzahl der zurückgegebenen Ergebnisse",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Liste von Sprachen",
@@ -1011,6 +1445,24 @@
                                     "items": {
                                         "$ref": "#/components/schemas/Sprache"
                                     }
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validierungsfehler",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string"
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
                                 }
                             }
                         }
@@ -1229,6 +1681,29 @@
                 ],
                 "summary": "Liste aller Tickettypen",
                 "operationId": "55de1face28ab22b3c253491bc3c3cc6",
+                "parameters": [
+                    {
+                        "name": "query",
+                        "in": "query",
+                        "description": "Suchbegriff zum Filtern der Tickettypen",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "maxLength": 255
+                        }
+                    },
+                    {
+                        "name": "limit",
+                        "in": "query",
+                        "description": "Maximale Anzahl der zurückzugebenden Tickettypen",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "maximum": 100,
+                            "minimum": 1
+                        }
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "Liste von Tickettypen",
@@ -1461,10 +1936,11 @@
                     "reihe",
                     "platz",
                     "untertitel",
-                    "film_id",
-                    "typ_id",
-                    "sprache_id",
-                    "saal_id"
+                    "film",
+                    "typ",
+                    "sprache",
+                    "saal",
+                    "kino"
                 ],
                 "properties": {
                     "id": {
@@ -1500,25 +1976,75 @@
                         "example": 3.5,
                         "nullable": true
                     },
-                    "film_id": {
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
+                    "film": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1
+                            },
+                            "titel": {
+                                "type": "string",
+                                "example": "Oppenheimer"
+                            }
+                        },
+                        "type": "object"
                     },
-                    "typ_id": {
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
+                    "typ": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Standard"
+                            }
+                        },
+                        "type": "object"
                     },
-                    "sprache_id": {
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
+                    "sprache": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Deutsch"
+                            }
+                        },
+                        "type": "object"
                     },
-                    "saal_id": {
-                        "type": "integer",
-                        "format": "int64",
-                        "example": 1
+                    "saal": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Saal 1"
+                            }
+                        },
+                        "type": "object"
+                    },
+                    "kino": {
+                        "properties": {
+                            "id": {
+                                "type": "integer",
+                                "format": "int64",
+                                "example": 1
+                            },
+                            "name": {
+                                "type": "string",
+                                "example": "Cinépolis"
+                            }
+                        },
+                        "type": "object"
                     },
                     "created_at": {
                         "type": "string",
@@ -1591,6 +2117,72 @@
                         "type": "integer",
                         "format": "int64",
                         "example": 1
+                    }
+                },
+                "type": "object"
+            },
+            "Einstellung": {
+                "title": "Einstellung",
+                "description": "Einstellung Model",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "format": "int64",
+                        "example": 1
+                    },
+                    "key": {
+                        "type": "string",
+                        "example": "ticket_basispreis"
+                    },
+                    "value": {
+                        "type": "string",
+                        "example": "12.50"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Basispreis für alle Tickets"
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time"
+                    }
+                },
+                "type": "object"
+            },
+            "EinstellungInput": {
+                "title": "EinstellungInput",
+                "description": "Einstellung Input Schema",
+                "properties": {
+                    "key": {
+                        "type": "string",
+                        "example": "ticket_basispreis"
+                    },
+                    "value": {
+                        "type": "string",
+                        "example": "12.50"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Basispreis für alle Tickets"
+                    }
+                },
+                "type": "object"
+            },
+            "EinstellungUpdateInput": {
+                "title": "EinstellungUpdateInput",
+                "description": "Einstellung Update Input Schema",
+                "properties": {
+                    "value": {
+                        "type": "string",
+                        "example": "12.50"
+                    },
+                    "description": {
+                        "type": "string",
+                        "example": "Basispreis für alle Tickets"
                     }
                 },
                 "type": "object"
@@ -1837,6 +2429,10 @@
         {
             "name": "Besuche",
             "description": "API-Endpunkte zum Verwalten von Kinobesuchen"
+        },
+        {
+            "name": "Einstellungen",
+            "description": "API-Endpunkte zum Verwalten von Einstellungen"
         },
         {
             "name": "Filme",

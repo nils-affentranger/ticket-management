@@ -16,22 +16,152 @@ class BesuchController extends Controller
 {
     /**
      * @OA\Get(
-     *     path="/api/besuche",
-     *     summary="Liste aller Kinobesuche",
-     *     tags={"Besuche"},
-     *     @OA\Response(
-     *         response="200",
-     *         description="Liste von Kinobesuchen",
-     *         @OA\JsonContent(
-     *             type="array",
-     *             @OA\Items(ref="#/components/schemas/Besuch")
-     *         )
-     *     )
+     * path="/api/besuche",
+     * summary="Liste aller Kinobesuche",
+     * tags={"Besuche"},
+     * @OA\Parameter(
+     * name="datum",
+     * in="query",
+     * description="Filtert nach Datum",
+     * required=false,
+     * @OA\Schema(type="string", format="date")
+     * ),
+     * @OA\Parameter(
+     * name="typ_id",
+     * in="query",
+     * description="Filtert nach Typ ID",
+     * required=false,
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\Parameter(
+     * name="film_id",
+     * in="query",
+     * description="Filtert nach Film ID",
+     * required=false,
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\Parameter(
+     * name="kino_id",
+     * in="query",
+     * description="Filtert nach Kino ID",
+     * required=false,
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\Parameter(
+     * name="saal_id",
+     * in="query",
+     * description="Filtert nach Saal ID",
+     * required=false,
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\Parameter(
+     * name="sprache_id",
+     * in="query",
+     * description="Filtert nach Sprache ID",
+     * required=false,
+     * @OA\Schema(type="integer")
+     * ),
+     * @OA\Response(
+     * response="200",
+     * description="Liste von Kinobesuchen",
+     * @OA\JsonContent(
+     * type="array",
+     * @OA\Items(ref="#/components/schemas/Besuch")
+     * )
+     * )
      * )
      */
-    public function index()
+    public function index(Request $request)
     {
-        return response()->json(Besuch::all());
+        $validated = $request->validate([
+            'datum' => 'sometimes|date',
+            'typ_id' => 'sometimes|integer|exists:typen,id',
+            'film_id' => 'sometimes|integer|exists:filme,id',
+            'kino_id' => 'sometimes|integer|exists:kinos,id',
+            'saal_id' => 'sometimes|integer|exists:saele,id',
+            'sprache_id' => 'sometimes|integer|exists:sprachen,id',
+        ]);
+
+        // Start with a base query with eager loading
+        $query = Besuch::with([
+            'film:id,filmtitel',
+            'typ:id,name',
+            'sprache:id,name',
+            'saal:id,name,kino_id',
+            'saal.kino:id,name'
+        ]);
+
+        // Apply each filter condition if present
+        if (isset($validated['datum'])) {
+            $query->whereDate('anfang', $validated['datum']);
+        }
+
+        if (isset($validated['film_id'])) {
+            $query->where('film_id', $validated['film_id']);
+        }
+
+        if (isset($validated['typ_id'])) {
+            $query->where('typ_id', $validated['typ_id']);
+        }
+
+        if (isset($validated['saal_id'])) {
+            $query->where('saal_id', $validated['saal_id']);
+        }
+
+        if (isset($validated['sprache_id'])) {
+            $query->where('sprache_id', $validated['sprache_id']);
+        }
+
+        if (isset($validated['kino_id'])) {
+            $query->whereHas('saal', function ($q) use ($validated) {
+                $q->where('kino_id', $validated['kino_id']);
+            });
+        }
+
+        $besuche = $query->get();
+
+        // Transform the data to match the desired output format
+        $result = $besuche->map(function ($besuch) {
+            // Get the kino data from the saal relationship
+            $kino = $besuch->saal->kino;
+
+            // Create the desired output structure
+            $transformed = [
+                'id' => $besuch->id,
+                'anfang' => $besuch->anfang,
+                'ende' => $besuch->ende,
+                'reihe' => $besuch->reihe,
+                'platz' => $besuch->platz,
+                'untertitel' => $besuch->untertitel,
+                'snackzuschlag_chf' => $besuch->snackzuschlag_chf,
+                'film' => [
+                    'id' => $besuch->film->id,
+                    'titel' => $besuch->film->filmtitel
+                ],
+                'typ' => [
+                    'id' => $besuch->typ->id,
+                    'name' => $besuch->typ->name
+                ],
+                'sprache' => [
+                    'id' => $besuch->sprache->id,
+                    'name' => $besuch->sprache->name
+                ],
+                'saal' => [
+                    'id' => $besuch->saal->id,
+                    'name' => $besuch->saal->name
+                ],
+                'kino' => [
+                    'id' => $kino->id,
+                    'name' => $kino->name
+                ],
+                'created_at' => $besuch->created_at,
+                'updated_at' => $besuch->updated_at
+            ];
+
+            return $transformed;
+        });
+
+        return response()->json($result);
     }
 
     /**
@@ -74,8 +204,8 @@ class BesuchController extends Controller
         ]);
 
         $besuch = new Besuch();
-        $besuch->anfang = $validated['anfang'];
-        $besuch->ende = $validated['ende'];
+        $besuch->anfang = date('Y-m-d H:i:s', strtotime($validated['anfang']));
+        $besuch->ende = date('Y-m-d H:i:s', strtotime($validated['ende']));
         $besuch->reihe = $validated['reihe'];
         $besuch->platz = $validated['platz'];
         $besuch->untertitel = $validated['untertitel'];
@@ -172,7 +302,6 @@ class BesuchController extends Controller
     public function update(Request $request, $id)
     {
         $besuch = Besuch::find($id);
-
         if (!$besuch) {
             return response()->json([
                 'message' => 'Besuch nicht gefunden.',
@@ -192,6 +321,14 @@ class BesuchController extends Controller
             'sprache_id' => 'sometimes|required|exists:sprachen,id',
             'saal_id' => 'sometimes|required|exists:saele,id',
         ]);
+
+        if (isset($validated['anfang'])) {
+            $validated['anfang'] = date('Y-m-d H:i:s', strtotime($validated['anfang']));
+        }
+
+        if (isset($validated['ende'])) {
+            $validated['ende'] = date('Y-m-d H:i:s', strtotime($validated['ende']));
+        }
 
         $besuch->fill($validated);
         $besuch->save();
