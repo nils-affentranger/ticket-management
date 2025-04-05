@@ -1,50 +1,88 @@
+version: '3'
+
 services:
-    app:
-        build:
-            context: .
-            dockerfile: Dockerfile
-        image: php:8.2-fpm
-        container_name: ticket_manager_app
-        working_dir: /var/www
-        volumes:
-            - .:/var/www
-        networks:
-            - ticket-manager
-        depends_on:
-            - db
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ticket_manager_app
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www:delegated
+      - ./docker-entrypoint.sh:/usr/local/bin/docker-entrypoint.sh
+    expose:
+      - "9000"
+    networks:
+      - ticket-manager
+    depends_on:
+      - db
+    restart: unless-stopped
+    user: root
+    environment:
+      # Enable automatic migrations on startup
+      RUN_MIGRATIONS: "true"
+      # Optionally enable seeding (change to "true" if needed)
+      RUN_SEEDS: "false"
+      # Database connection parameters
+      DB_CONNECTION_USER: "ticket-manager"
+      DB_CONNECTION_PASSWORD: "admin123"
+      DB_CONNECTION_DB: "ticket-manager"
 
-    webserver:
-        image: nginx:alpine
-        container_name: ticket_manager_laravel_webserver
-        ports:
-            - "8000:80"
-        volumes:
-            - .:/var/www
-            - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-        networks:
-            - ticket-manager
-        depends_on:
-            - app
+  webserver:
+    image: nginx:alpine
+    container_name: ticket_manager_webserver
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www:delegated
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - ticket-manager
+    depends_on:
+      - app
+    restart: unless-stopped
 
-    db:
-        image: mariadb:10.5
-        container_name: ticker_manager_db
-        environment:
-            MYSQL_DATABASE: ticket-manager
-            MYSQL_USER: ticket-manager
-            MYSQL_PASSWORD: admin123
-            MYSQL_ROOT_PASSWORD: admin123
-        ports:
-            - "3306:3306"
-        volumes:
-            - dbdata:/var/lib/mysql
-        networks:
-            - ticket-manager
+  db:
+    image: mariadb:10.5
+    container_name: ticket_manager_db
+    environment:
+      MYSQL_DATABASE: ticket-manager
+      MYSQL_USER: ticket-manager
+      MYSQL_PASSWORD: admin123
+      MYSQL_ROOT_PASSWORD: admin123
+    ports:
+      - "3306:3306" 
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - ticket-manager
+    restart: unless-stopped
+    
+  # Dedicated service for running migrations on demand
+  migrate:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ticket_manager_migrate
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www:delegated
+    networks:
+      - ticket-manager
+    depends_on:
+      - db
+    environment:
+      DB_CONNECTION_USER: "ticket-manager"
+      DB_CONNECTION_PASSWORD: "admin123"
+      DB_CONNECTION_DB: "ticket-manager"
+    command: sh -c "php artisan migrate --force"
+    profiles:
+      - migration
 
 networks:
-    ticket-manager:
-        driver: bridge
+  ticket-manager:
+    driver: bridge
 
 volumes:
-    dbdata:
-        driver: local
+  dbdata:
+    driver: local
